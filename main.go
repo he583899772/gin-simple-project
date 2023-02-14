@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"gin-simple-project/global/variable"
 	"gin-simple-project/routers"
 	"log"
 	"net/http"
@@ -11,6 +12,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/go-redis/redis"
 
 	"github.com/gin-gonic/gin"
 
@@ -27,6 +30,7 @@ func init() {
 		log.Fatalf("配置文件读取失败: %s\n", err)
 	}
 	//models.InitDB()
+	//initRedis()
 }
 
 func main() {
@@ -57,4 +61,19 @@ func main() {
 		log.Fatal("Server Shutdown:", err)
 	}
 	log.Println("Server exiting...")
+}
+
+// 初始化连接
+func initRedis() (err error) {
+	variable.Rdb = redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%d", viper.GetString("redis.host"), viper.GetInt("redis.port")),
+		Password: viper.GetString("redis.password"), // no password set
+		DB:       0,                                 // use default DB
+	})
+
+	_, err = variable.Rdb.Ping().Result()
+	if err != nil {
+		return err
+	}
+	return nil
 }

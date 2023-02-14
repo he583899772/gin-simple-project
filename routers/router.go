@@ -14,6 +14,7 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(middleware.Translations("zh"))
+	r.Use(middleware.AddTraceId()) //添加全局的traceId
 
 	apiv1 := r.Group("/v1/example")
 	{
